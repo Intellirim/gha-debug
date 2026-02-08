@@ -13,7 +13,7 @@ from gha_debug.parser import WorkflowParser
 from gha_debug.runner import WorkflowRunner
 from gha_debug.validator import WorkflowValidator
 
-console = Console()
+console = Console(force_terminal=True)
 
 
 @click.group()
@@ -62,7 +62,7 @@ def list(workflow_path: str) -> None:
         if path.is_file():
             workflow_files = [path]
         elif path.is_dir():
-            workflow_files = list(path.glob("*.yml")) + list(path.glob("*.yaml"))
+            workflow_files = sorted(path.glob("*.yml")) + sorted(path.glob("*.yaml"))
         else:
             console.print(f"[yellow]Warning:[/yellow] Path not found: {workflow_path}")
             sys.exit(1)
@@ -125,7 +125,7 @@ def validate(workflow_paths: tuple) -> None:
                     for error in errors:
                         console.print(f"  [red]•[/red] {error}")
                 else:
-                    console.print(f"[green]✓[/green] {file_path}")
+                    console.print(f"[green]OK[/green] {str(file_path)}")
 
         if all_valid:
             console.print("\n[green]All workflows are valid![/green]")

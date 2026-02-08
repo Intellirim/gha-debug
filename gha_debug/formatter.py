@@ -6,7 +6,7 @@ from typing import Any, Dict, Optional
 from rich.console import Console
 from rich.table import Table
 
-console = Console()
+console = Console(force_terminal=True)
 
 
 class Formatter:
@@ -30,7 +30,7 @@ class Formatter:
             step_name: Name of the step
             elapsed: Time elapsed in seconds
         """
-        console.print(f"  [green]✓[/green] {step_name} [dim]({elapsed:.1f}s)[/dim]")
+        console.print(f"  [green]OK[/green] {step_name} [dim]({elapsed:.1f}s)[/dim]")
 
     def print_step_failure(self, step_name: str, elapsed: float) -> None:
         """Print failed step.
@@ -39,7 +39,7 @@ class Formatter:
             step_name: Name of the step
             elapsed: Time elapsed in seconds
         """
-        console.print(f"  [red]✗[/red] {step_name} [dim]({elapsed:.1f}s)[/dim]")
+        console.print(f"  [red]FAIL[/red] {step_name} [dim]({elapsed:.1f}s)[/dim]")
 
     def print_success(self, total_time: float) -> None:
         """Print workflow success message.
@@ -47,7 +47,7 @@ class Formatter:
         Args:
             total_time: Total execution time in seconds
         """
-        console.print(f"\n[green]✓ Workflow completed successfully in {total_time:.1f}s[/green]")
+        console.print(f"\n[green]OK Workflow completed successfully in {total_time:.1f}s[/green]")
 
     def print_failure(self, error: str) -> None:
         """Print workflow failure message.
@@ -55,7 +55,7 @@ class Formatter:
         Args:
             error: Error message
         """
-        console.print(f"\n[red]✗ Workflow failed: {error}[/red]")
+        console.print(f"\n[red]FAIL Workflow failed: {error}[/red]")
 
     def print_workflow_structure(self, workflow: Dict[str, Any], path: Path) -> None:
         """Print workflow structure with jobs and steps.
@@ -70,7 +70,7 @@ class Formatter:
             console.print(f"  [cyan]Job:[/cyan] {job['name']} [dim](runs-on: {job['runs-on']})[/dim]")
 
             for step in job["steps"]:
-                icon = "🔧" if step.get("uses") else "▶"
+                icon = ">" if step.get("uses") else "-"
                 console.print(f"    {icon} {step['name']}")
 
     def print_environment(self, workflow: Dict[str, Any], job_filter: Optional[str] = None) -> None:
