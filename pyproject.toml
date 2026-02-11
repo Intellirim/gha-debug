@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gha-debug"
-version = "0.1.1"
+version = "0.1.2"
 description = "Debug GitHub Actions workflows locally with step-by-step execution"
 readme = "README.md"
 license = {text = "MIT"}
