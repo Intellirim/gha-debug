@@ -130,7 +130,6 @@ class WorkflowRunner:
             if step.get("with"):
                 console.print(f"  [dim]With: {step['with']}[/dim]")
 
-        time.sleep(0.1)
         return True
 
     def _run_command(self, step: Dict[str, Any], env: Dict[str, str]) -> bool:

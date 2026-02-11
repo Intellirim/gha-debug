@@ -20,7 +20,6 @@ console = Console(force_terminal=True)
 @click.version_option(version=__version__)
 def cli() -> None:
     """Debug GitHub Actions workflows locally with step-by-step execution."""
-    pass
 
 
 @cli.command()

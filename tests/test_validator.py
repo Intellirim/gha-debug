@@ -27,6 +27,7 @@ jobs:
         validator = WorkflowValidator()
         errors = validator.validate(temp_path)
         assert len(errors) == 0
+        assert isinstance(errors, list)
     finally:
         temp_path.unlink()
 
@@ -46,6 +47,7 @@ on: [push]
         validator = WorkflowValidator()
         errors = validator.validate(temp_path)
         assert any("jobs" in error.lower() for error in errors)
+        assert len(errors) > 0
     finally:
         temp_path.unlink()
 
@@ -67,6 +69,7 @@ jobs:
         validator = WorkflowValidator()
         errors = validator.validate(temp_path)
         assert any("steps" in error.lower() for error in errors)
+        assert len(errors) > 0
     finally:
         temp_path.unlink()
 
@@ -90,6 +93,7 @@ jobs:
         validator = WorkflowValidator()
         errors = validator.validate(temp_path)
         assert any("uses" in error and "run" in error for error in errors)
+        assert len(errors) > 0
     finally:
         temp_path.unlink()
 
@@ -104,5 +108,6 @@ def test_validate_invalid_yaml():
         validator = WorkflowValidator()
         errors = validator.validate(temp_path)
         assert any("yaml" in error.lower() for error in errors)
+        assert len(errors) > 0
     finally:
         temp_path.unlink()

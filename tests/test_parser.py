@@ -48,8 +48,10 @@ def test_parse_missing_file():
     """Test parsing a non-existent file."""
     parser = WorkflowParser(Path("/nonexistent/file.yml"))
 
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(FileNotFoundError) as exc_info:
         parser.parse()
+    assert "not found" in str(exc_info.value)
+    assert "/nonexistent/file.yml" in str(exc_info.value)
 
 
 def test_parse_invalid_yaml():
@@ -60,8 +62,10 @@ def test_parse_invalid_yaml():
 
     try:
         parser = WorkflowParser(temp_path)
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError) as exc_info:
             parser.parse()
+        assert "Invalid YAML" in str(exc_info.value)
+        assert "workflow file" in str(exc_info.value)
     finally:
         temp_path.unlink()
 
