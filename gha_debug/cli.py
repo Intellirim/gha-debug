@@ -101,11 +101,13 @@ def env(workflow_path: str, job: Optional[str]) -> None:
 
 @cli.command()
 @click.argument("workflow_paths", nargs=-1, type=click.Path(exists=True), required=True)
-def validate(workflow_paths: tuple) -> None:
+@click.option("--html", is_flag=True, help="Generate HTML report and open in browser")
+def validate(workflow_paths: tuple, html: bool) -> None:
     """Validate workflow syntax and catch common errors."""
     try:
         validator = WorkflowValidator()
         all_valid = True
+        workflow_results = []
 
         for workflow_path in workflow_paths:
             path = Path(workflow_path)
@@ -118,6 +120,37 @@ def validate(workflow_paths: tuple) -> None:
             for file_path in files:
                 errors = validator.validate(file_path)
 
+                # Parse workflow for structure info
+                try:
+                    parser = WorkflowParser(file_path)
+                    workflow = parser.parse()
+                    wf_name = workflow.get("name", file_path.stem)
+                    jobs_data = []
+                    for job_id, job in workflow.get("jobs", {}).items():
+                        steps_data = []
+                        for step in job.get("steps", []):
+                            steps_data.append({
+                                "name": step.get("name", ""),
+                                "uses": step.get("uses", ""),
+                                "run": step.get("run", ""),
+                            })
+                        jobs_data.append({
+                            "name": job_id,
+                            "runs_on": job.get("runs-on", "?"),
+                            "steps": steps_data,
+                        })
+                except Exception:
+                    wf_name = file_path.stem
+                    jobs_data = []
+
+                workflow_results.append({
+                    "file": str(file_path),
+                    "name": wf_name,
+                    "valid": len(errors) == 0,
+                    "errors": errors,
+                    "jobs": jobs_data,
+                })
+
                 if errors:
                     all_valid = False
                     console.print(f"\n[red]✗[/red] {file_path}")
@@ -125,6 +158,14 @@ def validate(workflow_paths: tuple) -> None:
                         console.print(f"  [red]•[/red] {error}")
                 else:
                     console.print(f"[green]OK[/green] {str(file_path)}")
+
+        if html:
+            import webbrowser
+            from gha_debug.report import export_html
+            report_path = export_html(workflow_results)
+            console.print(f"Report saved: {report_path}")
+            webbrowser.open(f"file://{report_path}")
+            return
 
         if all_valid:
             console.print("\n[green]All workflows are valid![/green]")
